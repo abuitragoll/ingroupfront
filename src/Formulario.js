@@ -18,19 +18,19 @@ function Formulario() {
 
     setUser(null);
 
-    const preferencesList = preferencias.split(',');
-    const evenPreferences = preferencesList.filter((preference) => parseInt(preference) % 2 === 0 || parseInt(preference) === 0);
-    const oddPreferences = preferencesList.filter((preference) => parseInt(preference) % 2 !== 0);
+    const preferencesList = preferencias.split(',').map(Number);
+    const evenPreferences = preferencesList.filter((preference) => preference % 2 === 0 || preference === 0);
+    const oddPreferences = preferencesList.filter((preference) => preference % 2 !== 0);
 
     if (preferencesList.length === 0 || evenPreferences.length === 0 || oddPreferences.length === 0) {
-        console.log('Error en la petición: Deben haber al menos una par y otra impar');
+        toast.error('Error: Deben haber al menos una par y otra impar');
         setShowUserCard(false);
         return;
     }
 
     const uniquePreferences = new Set(preferencesList);
     if (uniquePreferences.size !== preferencesList.length) {
-        console.log('Error: No se pueden repetir las preferencias');
+        toast.error('Error: No se pueden repetir las preferencias');
         setShowUserCard(false);
         return;
     }
@@ -43,7 +43,8 @@ function Formulario() {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/users', {
+      console.log(JSON.stringify(userData))
+      const response = await fetch('https://ingroupback.onrender.com/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -53,14 +54,6 @@ function Formulario() {
 
       const data = await response.json();
       if (data) {
-        // HACK!!!
-        const data = {
-            "name": "Raul",
-            "email": "test@company",
-            "preferences": ["water","soda","peach_juice"],
-            "affiliate": "true"
-        }
-
         if (data.error) {
             toast.error("Error en la petición: " + data.error);
             setShowUserCard(false);
